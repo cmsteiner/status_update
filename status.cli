@@ -1,0 +1,38 @@
+###################################################################
+#                                                                 #
+# status.cli - script to check the status of a list of artifacts  #
+#                                                                 #
+# Original list must be in csv format, but can be single column   #
+# with the header 'ARTF'                                          #
+#                                                                 #
+# usage = ctf --script status.cli inFile.csv outFile.csv          #
+#                                                                 #
+# inFile.csv = csv file with original list of artifacts           #
+# outFile.csv = name of file to output status (must not exist)    #
+#                                                                 #
+# Output is csv with headers "Artifact,Title,Status" and contains #
+# that data by row for each artifact in the original list         #
+#                                                                 #
+###################################################################
+
+# Set date format for optput
+options set dateFormat %E %b %Y %H:%M
+
+# Create output file with headers based on name passed in as second command line argument after script name
+output $2
+echo Artifact,Title,Status,Assigned To,Last Modified By,Last Modified Date
+
+# Open input file (original list) and go through each one to find title and status based on artifact number
+loadcsv $1
+foreach
+do
+   ctf set NUM `print ARTF`
+   go $NUM
+   ctf set NO `print id`
+   ctf set TI `print title`
+   ctf set ST `print status`
+   ctf set AT `print assignedTo`
+   ctf set LMB `print lastModifiedBy`
+   ctf set LMD `print lastModifiedDate`
+   echo $NO,""$TI"",$ST,$AT,$LMB,$LMD
+done
